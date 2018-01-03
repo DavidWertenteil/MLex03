@@ -86,7 +86,7 @@ def training(n):
     # Training RBM-Logistic Pipeline
     time.time()
     classifier.fit(X_train, Y_train)
-    time_each_training.append((n**2, time.time()))
+    time_each_training.append(time.time())
 
     # Training Logistic regression
     logistic_classifier = linear_model.LogisticRegression(C=100.0)
@@ -96,19 +96,31 @@ def training(n):
     precisions_raw.append(precision_score(Y_test, logistic_classifier.predict(X_test), average='macro'))
 
     #  ----------------------------- Plotting -------------------------------
-    plt.figure(figsize=(4.2, 4))
-    for i, comp in enumerate(rbm.components_):
-        plt.subplot(n, n, i + 1)
-        plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
-                   interpolation='nearest')
-        plt.xticks(())
-        plt.yticks(())
-    plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
-    plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+    # plt.figure(figsize=(4.2, 4))
+    # for i, comp in enumerate(rbm.components_):
+    #     plt.subplot(n, n, i + 1)
+    #     plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
+    #                interpolation='nearest')
+    #     plt.xticks(())
+    #     plt.yticks(())
+    # plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
+    # plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
 
-
-
-for i in range(2, 21):
+ran = range(2, 21)
+for i in ran:
     training(i)
+plt.plot(time_each_training, precisions_RBM, 'b.-')
+plt.title("RBM vs Time")
+plt.xlabel("Time")
+plt.ylabel("Precisions RBM")
+
 plt.show()
+ran = [i**2 for i in ran]
+plt.plot(time_each_training, ran, 'b.-')
+plt.title("Number of Precisions vs Time")
+plt.xlabel("Time")
+plt.ylabel("Number of Precisions")
+
+plt.show()
+# plt.show()
 
