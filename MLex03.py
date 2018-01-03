@@ -84,9 +84,9 @@ def training(n):
     logistic.C = 6000.0
 
     # Training RBM-Logistic Pipeline
-    time.time()
+    first =  time.clock()
     classifier.fit(X_train, Y_train)
-    time_each_training.append(time.time())
+    time_each_training.append(abs(time.clock() - first))
 
     # Training Logistic regression
     logistic_classifier = linear_model.LogisticRegression(C=100.0)
