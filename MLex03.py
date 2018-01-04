@@ -13,7 +13,8 @@ from sklearn.neural_network import BernoulliRBM
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import precision_score
 import time
-
+import pandas
+import pickle
 # #############################################################################
 # Setting up
 
@@ -70,45 +71,55 @@ precisions_RBM = []
 precisions_raw = []
 
 
-def training(n):
-    # Training
+def training(n, classify):
+    filename = path.join("trained/", "{0}_components.sav".format(n**2))
+    if not path.exists(filename):
+        # Training
 
-    # Hyper-parameters. These were set by cross-validation,
-    # using a GridSearchCV. Here we are not performing cross-validation to
-    # save time.
-    rbm.learning_rate = 0.06
-    rbm.n_iter = 20
-    # More components tend to give better prediction performance, but larger
-    # fitting time
-    rbm.n_components = n ** 2
-    logistic.C = 6000.0
+        # Hyper-parameters. These were set by cross-validation,
+        # using a GridSearchCV. Here we are not performing cross-validation to
+        # save time.
+        rbm.learning_rate = 0.06
+        rbm.n_iter = 20
+        # More components tend to give better prediction performance, but larger
+        # fitting time
+        rbm.n_components = n ** 2
+        logistic.C = 6000.0
 
-    # Training RBM-Logistic Pipeline
-    first = time.clock()
-    classifier.fit(X_train, Y_train)
-    time_each_training.append(abs(time.clock() - first))
+        # Training RBM-Logistic Pipeline
+        first = time.clock()
+        classify.fit(X_train, Y_train)
+        time_each_training.append(abs(time.clock() - first))
 
-    # Training Logistic regression
-    logistic_classifier = linear_model.LogisticRegression(C=100.0)
-    logistic_classifier.fit(X_train, Y_train)
+        # Save features
+        pickle.dump(classify, open(filename, 'wb'))
 
-    precisions_RBM.append(precision_score(Y_test, classifier.predict(X_test), average='macro'))
+        # Training Logistic regression
+        logistic_classifier = linear_model.LogisticRegression(C=100.0)
+        logistic_classifier.fit(X_train, Y_train)
 
-    #  ----------------------------- Plotting -------------------------------
-    plt.figure(figsize=(4.2, 4))
-    for i, comp in enumerate(rbm.components_):
-        plt.subplot(n, n, i + 1)
-        plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
-                   interpolation='nearest')
-        plt.xticks(())
-        plt.yticks(())
-    plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
-    plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
-    plt.savefig(path.join("plots/", "{0}_components.png".format(n**2)))
+        precisions_RBM.append(precision_score(Y_test, classify.predict(X_test), average='macro'))
+
+        #  ----------------------------- Plotting -------------------------------
+        plt.figure(figsize=(4.2, 4))
+        for i, comp in enumerate(rbm.components_):
+            plt.subplot(n, n, i + 1)
+            plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
+                       interpolation='nearest')
+            plt.xticks(())
+            plt.yticks(())
+        plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
+        plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+        plt.savefig(path.join("plots/", "{0}_components.png".format(n**2)))
+
+    else:
+        # Load features
+        classify = pickle.load(open(filename, 'rb'))
+
 
 ran = range(2, 4)
 for i in ran:
-    training(i)
+    training(i, classifier)
 plt.plot(time_each_training, precisions_RBM, 'b.-')
 plt.title("RBM vs Time")
 plt.xlabel("Time")
