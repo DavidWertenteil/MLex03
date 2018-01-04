@@ -5,7 +5,7 @@ __author__ = 'davidwer'
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from os import path
 from scipy.ndimage import convolve
 from sklearn import linear_model, datasets, metrics
 from sklearn.model_selection import train_test_split
@@ -84,7 +84,7 @@ def training(n):
     logistic.C = 6000.0
 
     # Training RBM-Logistic Pipeline
-    first =  time.clock()
+    first = time.clock()
     classifier.fit(X_train, Y_train)
     time_each_training.append(abs(time.clock() - first))
 
@@ -93,34 +93,32 @@ def training(n):
     logistic_classifier.fit(X_train, Y_train)
 
     precisions_RBM.append(precision_score(Y_test, classifier.predict(X_test), average='macro'))
-    precisions_raw.append(precision_score(Y_test, logistic_classifier.predict(X_test), average='macro'))
 
     #  ----------------------------- Plotting -------------------------------
-    # plt.figure(figsize=(4.2, 4))
-    # for i, comp in enumerate(rbm.components_):
-    #     plt.subplot(n, n, i + 1)
-    #     plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
-    #                interpolation='nearest')
-    #     plt.xticks(())
-    #     plt.yticks(())
-    # plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
-    # plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+    plt.figure(figsize=(4.2, 4))
+    for i, comp in enumerate(rbm.components_):
+        plt.subplot(n, n, i + 1)
+        plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+        plt.xticks(())
+        plt.yticks(())
+    plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
+    plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+    plt.savefig(path.join("plots/", "{0}_components.png".format(n**2)))
 
-ran = range(2, 21)
+ran = range(2, 4)
 for i in ran:
     training(i)
 plt.plot(time_each_training, precisions_RBM, 'b.-')
 plt.title("RBM vs Time")
 plt.xlabel("Time")
 plt.ylabel("Precisions RBM")
+plt.savefig(path.join("plots/", "RBM vs Time.png"))
 
-plt.show()
 ran = [i**2 for i in ran]
 plt.plot(time_each_training, ran, 'b.-')
 plt.title("Number of Precisions vs Time")
 plt.xlabel("Time")
 plt.ylabel("Number of Precisions")
-
-plt.show()
-# plt.show()
+plt.savefig(path.join("plots/", "Number of Precisions vs Time"))
 
