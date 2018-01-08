@@ -124,7 +124,7 @@ def training(n, classify):
 ran = range(2, 21)
 for i in ran:
     training(i, classifier)
-plt.plot(time_each_training, precisions_RBM, 'b.-')
+plt.plot(time_each_training, precisions_RBM, 'b', [2, 400], [0.77, 0.77], 'r')
 plt.title("RBM vs Time")
 plt.xlabel("Time")
 plt.ylabel("Precisions RBM")
@@ -137,4 +137,3 @@ plt.xlabel("Time")
 plt.ylabel("Number of Precisions")
 plt.savefig(path.join("plots/", "Number of Precisions vs Time"))
 
-# ===========================================================================
