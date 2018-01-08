@@ -85,24 +85,9 @@ def training(n, classify):
     # Training RBM-Logistic Pipeline
     first = time.clock()
     classify.fit(X_train, Y_train)
-    time_each_training.append(abs(time.clock() - first))
+    time_each_training.append(time.clock() - first)
     # Save features
     pickle.dump(classify, open(filename, 'wb'))
-    # Training Logistic regression
-    logistic_classifier = linear_model.LogisticRegression(C=100.0)
-    logistic_classifier.fit(X_train, Y_train)
-    precisions_RBM.append(precision_score(Y_test, classify.predict(X_test), average='macro'))
-    #  ----------------------------- Plotting -------------------------------
-    plt.figure(figsize=(4.2, 4))
-    for i, comp in enumerate(rbm.components_):
-        plt.subplot(n, n, i + 1)
-        plt.imshow(comp.reshape((8, 8)), cmap=plt.cm.gray_r,
-                   interpolation='nearest')
-        plt.xticks(())
-        plt.yticks(())
-    plt.suptitle(str(n**2) + ' components extracted by RBM', fontsize=16)
-    plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
-    plt.savefig(path.join("plots/", "{0}_components.png".format(n**2)))
 
     # Training Logistic regression
     logistic_classifier = linear_model.LogisticRegression(C=100.0)
@@ -124,14 +109,22 @@ def training(n, classify):
 ran = range(2, 21)
 for i in ran:
     training(i, classifier)
-plt.plot(time_each_training, precisions_RBM, 'b', [2, 400], [0.77, 0.77], 'r')
+
+pickle.dump(time_each_training, open("trained/time_array.sav", 'wb'))
+pickle.dump(precisions_RBM, open("trained/precisions_RBM_array.sav", 'wb'))
+
+# time_each_training = pickle.load(open("trained/time_array.sav", 'rb'))
+# precisions_RBM = pickle.load(open("trained/precisions_RBM_array.sav", 'rb'))
+
+plt.plot(time_each_training, precisions_RBM, 'b', [0,time_each_training[len(time_each_training)-1]], [0.77, 0.77], 'r')
 plt.title("RBM vs Time")
 plt.xlabel("Time")
 plt.ylabel("Precisions RBM")
 plt.savefig(path.join("plots/", "RBM vs Time.png"))
+plt.close()
 
 ran = [i**2 for i in ran]
-plt.plot(time_each_training, ran, 'b.-')
+plt.plot(time_each_training, ran, 'b')
 plt.title("Number of Precisions vs Time")
 plt.xlabel("Time")
 plt.ylabel("Number of Precisions")
