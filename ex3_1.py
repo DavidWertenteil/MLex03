@@ -1,5 +1,5 @@
 __author__ = 'davidwer'
-
+__author2__ = 'omersc'
 # Authors: Yann N. Dauphin, Vlad Niculae, Gabriel Synnaeve
 # License: BSD
 
@@ -122,7 +122,6 @@ for i in ran:
 # precisions_RBM = pickle.load(open("trained/precisions_RBM_array.sav", 'rb'))
 
 plt.plot(time_each_training, precisions_RBM, 'b',
-         # [0, time_each_training[len(time_each_training)-1]],
          [0, time_each_training[-1]],
          [0.77, 0.77],
          'r')
