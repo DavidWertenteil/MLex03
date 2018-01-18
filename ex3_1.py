@@ -110,16 +110,16 @@ def training(n, classify):
 
 
 ran = range(2, 21)
-for i in ran:
-    training(i, classifier)
+# for i in ran:
+#     training(i, classifier)
 
 # Save data to files
 # pickle.dump(time_each_training, open("trained/time_array.sav", 'wb'))
 # pickle.dump(precisions_RBM, open("trained/precisions_RBM_array.sav", 'wb'))
 
 # For testing - Load features to plot:
-# time_each_training = pickle.load(open("trained/time_array.sav", 'rb'))
-# precisions_RBM = pickle.load(open("trained/precisions_RBM_array.sav", 'rb'))
+time_each_training = pickle.load(open("trained/time_array.sav", 'rb'))
+precisions_RBM = pickle.load(open("trained/precisions_RBM_array.sav", 'rb'))
 
 plt.plot(time_each_training, precisions_RBM, 'b',
          [0, time_each_training[-1]],
@@ -137,3 +137,4 @@ plt.title("Precisions vs Time")
 plt.xlabel("Time")
 plt.ylabel("Precision Score")
 plt.savefig(path.join("plots/", "Precision Score vs Time"))
+

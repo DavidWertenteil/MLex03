@@ -1,4 +1,4 @@
 X_train : (7188, 64)
 X_test : (1797, 64)
 rbm.transform(X_train): (7188, i^2)	- i is the iteration value
-rbm.intercept_hidden_: (i^2, 0)		- i is the iteration value
+rbm.intercept_hidden_: (i^2, 1)		- i is the iteration value
