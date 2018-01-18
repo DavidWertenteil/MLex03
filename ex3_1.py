@@ -17,6 +17,7 @@ import pickle
 # #############################################################################
 # Setting up
 
+
 def nudge_dataset(X, Y):
     """
     This produces a dataset 5 times bigger than the original one,
@@ -46,6 +47,7 @@ def nudge_dataset(X, Y):
                         for vector in direction_vectors])
     Y = np.concatenate([Y for _ in range(5)], axis=0)
     return X, Y
+
 
 # Load Data
 digits = datasets.load_digits()
@@ -83,16 +85,17 @@ def training(n, classify):
     rbm.n_components = n ** 2
     logistic.C = 6000.0
     # Training RBM-Logistic Pipeline
-    first = time.clock()
+    start_time = time.clock()
     classify.fit(X_train, Y_train)
-    time_each_training.append(time.clock() - first)
-    # Save features
+    time_each_training.append(time.clock() - start_time)
+    # Save features to file for later plotting
     pickle.dump(classify, open(filename, 'wb'))
 
     # Training Logistic regression
     logistic_classifier = linear_model.LogisticRegression(C=100.0)
     logistic_classifier.fit(X_train, Y_train)
-    precisions_RBM.append(precision_score(Y_test, classify.predict(X_test), average='macro'))
+    precisions_RBM.append(precision_score(Y_test, classify.predict(X_test),
+                                          average='macro'))
     #  ----------------------------- Plotting -------------------------------
     plt.figure(figsize=(4.2, 4))
     for i, comp in enumerate(rbm.components_):
@@ -110,13 +113,19 @@ ran = range(2, 21)
 for i in ran:
     training(i, classifier)
 
-pickle.dump(time_each_training, open("trained/time_array.sav", 'wb'))
-pickle.dump(precisions_RBM, open("trained/precisions_RBM_array.sav", 'wb'))
+# Save data to files
+# pickle.dump(time_each_training, open("trained/time_array.sav", 'wb'))
+# pickle.dump(precisions_RBM, open("trained/precisions_RBM_array.sav", 'wb'))
 
+# For testing - Load features to plot:
 # time_each_training = pickle.load(open("trained/time_array.sav", 'rb'))
 # precisions_RBM = pickle.load(open("trained/precisions_RBM_array.sav", 'rb'))
 
-plt.plot(time_each_training, precisions_RBM, 'b', [0,time_each_training[len(time_each_training)-1]], [0.77, 0.77], 'r')
+plt.plot(time_each_training, precisions_RBM, 'b',
+         # [0, time_each_training[len(time_each_training)-1]],
+         [0, time_each_training[-1]],
+         [0.77, 0.77],
+         'r')
 plt.title("RBM vs Time")
 plt.xlabel("Time")
 plt.ylabel("Precisions RBM")
@@ -125,8 +134,7 @@ plt.close()
 
 ran = [i**2 for i in ran]
 plt.plot(time_each_training, ran, 'b')
-plt.title("Number of Precisions vs Time")
+plt.title("Precisions vs Time")
 plt.xlabel("Time")
-plt.ylabel("Number of Precisions")
-plt.savefig(path.join("plots/", "Number of Precisions vs Time"))
-
+plt.ylabel("Precision Score")
+plt.savefig(path.join("plots/", "Precision Score vs Time"))
